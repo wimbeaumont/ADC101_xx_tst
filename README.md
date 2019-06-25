@@ -28,6 +28,8 @@ creates the sub dir  ADC101_xx_tst  with the main rpgoram
 then ( in cmd  ) in HOME dir 
 mbed new ADC101_xx_tst --scm none   , same dir name so it adds the mbed  stuff there 
 
+---
+
 now the dir looks like 
  Directory of C:\Users\wimb\My Documents\mbed_cli\
 
@@ -40,7 +42,9 @@ now the dir looks like
 25-Jun-19  14:27               114 mbed_app.json
 25-Jun-19  14:27             1,384 mbed_settings.py
 25-Jun-19  14:24               652 README.md
-  
+
+---
+
 cd ADC101_xx_tst   
 now add the lib's
  git clone https://github.com/wimbeaumont/PerDevices.git
