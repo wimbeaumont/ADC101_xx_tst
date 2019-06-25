@@ -54,7 +54,45 @@ now add the lib's
  
  will add .gitignore for all mbed specic stuff. 
  
+ 
+ 
+ New, multi project   
+ 
 
+  C:\Users\wimb\My Documents\mbed_cli   is the projdir
+  
+  now git clone 
+   git clone https://github.com/wimbeaumont/PeripheralDevices.git
+   
+  git clone https://github.com/wimbeaumont/peripheral_dev_tst.git
+
+  
+  In the projdir 
+  mbed import mbed-os
+  
+  set the global 
+ 
+ So the .mbed is now 
+ 
+ 
+GCC_ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin
+TOOLCHAIN=GCC_ARM
+ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin
+MBED_OS_DIR=C:\Users\wimb\My Documents\mbed_cli\mbed-os
+
+cd peripheral_dev_tst 
+
+
+C:\Users\wimb\My Documents\mbed_cli\peripheral_dev_tst>mbed new ADC101_xx_tst -s   
+(is this really needed ?) 
+cm none
+
+ now compile for MBED
+ in projdir
+ 
+ mbed compile -m KL25Z --source peripheral_dev_tst/ADC101_xx_tst --source PeripheralDevices --source mbed-os --build BUILD/ADC101_xx_tst
+
+mbed compile -m KL25Z --source peripheral_dev_tst/MPC4725test --source PeripheralDevices --source mbed-os --build BUILD/MCP4725test
 
 
 

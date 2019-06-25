@@ -1,8 +1,1 @@
-.mbed
-__pycache__
 BUILD
-mbed-os
-PerDevices
-mbed_app.json
-mbed_settings.py
-mbed-os.lib
