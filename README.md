@@ -76,6 +76,10 @@ As you notice in the last case the is not made a new mbed project.  So not so cl
 This method will most likely not work for the KL02Z as this device is not supported for mbed os > 2.x 
 Perhaps it works when using python 2.7 
 
+for more info this is a nice page 
+
+https://os.mbed.com/docs/mbed-os/v5.12/tools/working-with-mbed-cli.html
+
 
 ## raspberry PI 
 
