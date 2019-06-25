@@ -1,6 +1,19 @@
+/** 
+*  program to test the ADC101_xx  class 
+*  for more info see the README.MD of the repository 
+*  https://github.com/wimbeaumont/peripheral_dev_tst.git
+*  copied from the mbed online compiler envionment 
+*  ver 0.3  compiled in mbed-cli envionment for the KL025Z 
+*
+* (C) Wim Beaumont Universiteit Antwerpen  2019
+**/
+
+
+
+
 #include "mbed.h"
 
-#define ADC101_xx_test_ver  "0.2"
+#define ADC101_xx_test_ver  "0.3"
 
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
   PinName const SDA = PTE25;

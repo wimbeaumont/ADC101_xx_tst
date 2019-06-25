@@ -1,98 +1,83 @@
-# ADC101_xx_tst
-test program for the ADC101_xx  i2c devices
+# peripheral_dev_tst
+
+test program for the  i2c devices in PerDevices repository
 
 
-This a simple test program for the class ADC101_xx  
-It needs also the repository https://github.com/wimbeaumont/PerDevices
+## MBED 
+
+These a simple test programs  needs also the repository https://github.com/wimbeaumont/PerDevices
 
 This contains classes and I2C abstraction. 
-For the moment (june 2019 ) it works only withint an MBED environment  mbed-cli is used .
+For the moment (june 2019 ) it works only withint an MBED environment  
+the  mbed-cli is used .
+MBED os  5.12  ( the latests at this moment) 
+
 
 Checked on windows 7
-Installed python3  and Mbed_installer_v0.4.10.exe   (mbed-cli ) 
+
+git was already installed 
+Installed python3  
+installed mercurial 
+Mbed_installer_v0.4.10.exe   (mbed-cli ) 
+
 Needed some time to understand the default settings. 
-
-so in the file .mbed ( in  ~user\.mbed ) 
-
-GCC_ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin
-TOOLCHAIN=GCC_ARM
-
-testing now. more install info will follow 
-
-
-starting directory  C:\Users\wimb\Documents\mbed_cli\ADC101_xx_tst   == HOME
-starting with ( git bash ) 
-git clone https://github.com/wimbeaumont/ADC101_xx_tst.git
-creates the sub dir  ADC101_xx_tst  with the main rpgoram 
-
-then ( in cmd  ) in HOME dir 
-mbed new ADC101_xx_tst --scm none   , same dir name so it adds the mbed  stuff there 
-
----
-
-now the dir looks like 
- Directory of C:\Users\wimb\My Documents\mbed_cli\
-
-25-Jun-19  14:27    <DIR>          .
-25-Jun-19  14:27    <DIR>          ..
-25-Jun-19  14:27                 8 .mbed
-25-Jun-19  14:24             1,793 main.cpp
-25-Jun-19  14:27    <DIR>          mbed-os
-25-Jun-19  14:27                78 mbed-os.lib
-25-Jun-19  14:27               114 mbed_app.json
-25-Jun-19  14:27             1,384 mbed_settings.py
-25-Jun-19  14:24               652 README.md
-
----
-
-cd ADC101_xx_tst   
-now add the lib's
- git clone https://github.com/wimbeaumont/PerDevices.git
  
- and then 
- C:\Users\wimb\My Documents\mbed_cli\ADC101_xx_tst>mbed compile -m KL25Z
- 
- will add .gitignore for all mbed specic stuff. 
- 
- 
- 
- New, multi project   
- 
+This is handled as a  multi project   
 
-  C:\Users\wimb\My Documents\mbed_cli   is the projdir
-  
-  now git clone 
-   git clone https://github.com/wimbeaumont/PeripheralDevices.git
+C:\Users\wimb\My Documents\mbed_cli   is the projdir
+
+in the projdir git clone 
+
+git clone https://github.com/wimbeaumont/PeripheralDevices.git
    
-  git clone https://github.com/wimbeaumont/peripheral_dev_tst.git
+git clone https://github.com/wimbeaumont/peripheral_dev_tst.git
 
   
   In the projdir 
-  mbed import mbed-os
+
+mbed import mbed-os
   
-  set the global 
+set the globals  
+mbed config -G MBED_OS_DIR mbed-os
  
- So the .mbed is now 
+So the .mbed is now 
+( this is in the user home directory so in this case C:\Users\wimb\.mbed ) 
  
  
-GCC_ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin
-TOOLCHAIN=GCC_ARM
-ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin
-MBED_OS_DIR=C:\Users\wimb\My Documents\mbed_cli\mbed-os
+GCC_ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin <br>
+TOOLCHAIN=GCC_ARM<br>
+ARM_PATH=C:\Program Files (x86)\GNU Tools ARM Embedded\6 2017-q2-update\bin<br>
+MBED_OS_DIR=C:\Users\wimb\My Documents\mbed_cli\mbed-os<br>
+
+now  prepare the mbed project 
 
 cd peripheral_dev_tst 
 
+C:\Users\wimb\My Documents\mbed_cli\peripheral_dev_tst>mbed new ADC101_xx_tst -scm none 
 
-C:\Users\wimb\My Documents\mbed_cli\peripheral_dev_tst>mbed new ADC101_xx_tst -s   
-(is this really needed ?) 
-cm none
+(is this really needed ?  the --scm none is to avoid the .git is overwriten ) 
 
  now compile for MBED
- in projdir
- 
- mbed compile -m KL25Z --source peripheral_dev_tst/ADC101_xx_tst --source PeripheralDevices --source mbed-os --build BUILD/ADC101_xx_tst
+
+in projdir
+
+mbed compile -m KL25Z --source peripheral_dev_tst/ADC101_xx_tst --source PeripheralDevices --source mbed-os --build BUILD/ADC101_xx_tst
+
+not tested with the ADC101  but the KL25Z responds correctly 
 
 mbed compile -m KL25Z --source peripheral_dev_tst/MPC4725test --source PeripheralDevices --source mbed-os --build BUILD/MCP4725test
+
+not tested with the MPC4725  but the KL25Z responds 
+
+
+As you notice in the last case the is not made a new mbed project.  So not so clear if you have to do it at all as with the paramters and global settings you almost define all needed. 
+
+
+This method will most likely not work for the KL02Z as this device is not supported for mbed os > 2.x 
+Perhaps it works when using python 2.7 
+
+
+## raspberry PI 
 
 
 
