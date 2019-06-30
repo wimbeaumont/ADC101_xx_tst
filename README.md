@@ -80,6 +80,24 @@ for more info this is a nice page
 
 https://os.mbed.com/docs/mbed-os/v5.12/tools/working-with-mbed-cli.html
 
+## dummy  Linux 
+
+This is a version to compile / develop with a full develop system ( standard linux desktop environment)
+Tested with CentOs  7
+
+Uses cmake to generate the test programs
+
+go to the cmake directory<br>
+there  $>cmake . <br>
+then  $>make  <br> 
+
+
+
+
+
+
+
+
 
 ## raspberry PI 
 
