@@ -12,7 +12,7 @@
 
 #define MCP4725test_ver  "0.4"
 
-#ifdef MBED 
+#ifdef __MBED__ 
 #include "mbed.h"
 
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
@@ -32,7 +32,7 @@ Serial pc(USBTX, USBRX);
 
 #endif
 
-#ifdef MBED 
+#ifdef __MBED__ 
 #include "I2C.h"
 #include "MBEDI2CInterface.h" 
 #else 
@@ -46,7 +46,7 @@ Serial pc(USBTX, USBRX);
 #include "mcp4725.h"
 
 
-#ifdef MBED 
+#ifdef __MBED__ 
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 #else 

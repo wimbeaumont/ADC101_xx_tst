@@ -11,7 +11,7 @@
 **/
 
 
-#ifdef MBED 
+#ifdef __MBED__ 
 #include "mbed.h"
 #endif
 
@@ -19,7 +19,7 @@
 #define ADC101_xx_test_ver  "0.4"
 
 
-#ifdef MBED 
+#ifdef __MBED__ 
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
   PinName const SDA = PTE25;
   PinName const SCL = PTE24;
@@ -34,7 +34,7 @@
 #endif
 #endif 
 
-#ifdef MBED 
+#ifdef __MBED__ 
 #include "I2C.h"
 #include "MBEDI2CInterface.h" 
 #else 
@@ -49,7 +49,7 @@
 
 #include "ADC101_xx.h"
 
-#ifdef MBED 
+#ifdef __MBED__ 
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 #else 
@@ -65,7 +65,7 @@ I2CInterface* i2cdev= mbedi2cp;
 const float Vdd=3.293;
 
 
-#ifdef MBED 
+#ifdef __MBED__ 
 Serial pc(USBTX, USBRX);
 #endif
 
