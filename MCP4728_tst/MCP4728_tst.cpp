@@ -114,7 +114,7 @@ int main(void) {
  
    MCP4728  dac( i2cdev ,addr, Vdd);  // assuming the address  of the MCP4728 is set to 0 factory default 
    printf("\n\raddr %d MCP4728 :%s\n\r",addr,dac.getversioninfo());
-   wait(1);
+   i2cdev->wait_for_ms(1000);
    float voltage=0;
    int cnt=0;
    while(cnt < 4096){
@@ -135,7 +135,7 @@ int main(void) {
             }
              cnt++;
              cnt=cnt % 4096;     
-             wait_ms(1200);
+             i2cdev->wait_for_ms(1200);
 
   }
 
@@ -161,7 +161,7 @@ int main(void) {
             
              cnt++;
              cnt=cnt % 4096;     
-             wait_ms(200);
+             i2cdev->wait_for_ms(200);
 
   }
   

@@ -109,14 +109,14 @@ int main(void) {
             shs.GetRawHumidity(&H_T_OUT);
             hum=H0_rh+ ( H1_rh -H0_rh) * (float) ( H_T_OUT - H0_T0_out) / float(H1_T0_out-H0_T0_out);
             printf("Humidity %f ,RawData %d \n\r",hum,H_T_OUT);
-            wait_ms(1000); 
+            i2cdev->wait_for_ms(1000); 
         }
         else {
             printf(" on heater for 5 s lc:%d \n\r",lc++);
             shs.Heater_On();
-            wait_ms(5000);
+            i2cdev->wait_for_ms(5000);
             shs.Heater_Off();
-            wait_ms(1000);
+            i2cdev->wait_for_ms(1000);
         }
     }
     

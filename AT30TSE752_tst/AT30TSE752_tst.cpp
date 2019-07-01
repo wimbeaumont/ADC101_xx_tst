@@ -32,10 +32,13 @@
   #error TARGET NOT DEFINED
 #endif
 
+Serial pc(USBTX, USBRX);
+
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
 #else  // __MBED__ 
 #include <cstdio>
+#include <cstdlib>
 #include "DummyI2CInterface.h"
 #endif  // __MBED__ 
 
@@ -55,7 +58,7 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 
 I2CInterface* i2cdev= mbedi2cp;
 
-Serial pc(USBTX, USBRX);
+
 
 void print_buf_hex( char *data, int length){
     int nr;
@@ -124,7 +127,7 @@ int main(void) {
        } // if
     } // for 
     printf("\n\r");
-    wait_ms(500);
+    i2cdev->wait_for_ms(500);
   } //while
     
 }   
