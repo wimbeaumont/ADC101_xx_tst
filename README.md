@@ -8,7 +8,7 @@
 	* [MCP4725 ](#MCP4725-)
 	* [MCP4728_tst](#MCP4728_tst)
 * [MBED ](#MBED-)
-	* [preparations : ](#preparations-:-)
+	* [preparations : ](#preparations-)
 	* [generating the programing files ](#generating-the-programing-files-)
 * [dummy  Linux ](#dummy--Linux-)
 * [raspberry PI ](#raspberry-PI-)
@@ -108,7 +108,7 @@ MBED os  5.12  ( the latest at this moment)  As I use python 3  older MBED versi
 Assumed is that the \_\_MBED\_\_ variable is set. This is used to include / define MBED specific code 
 
 
-### preparations : 
+### preparations 
 
 Worked on windows 7
 
