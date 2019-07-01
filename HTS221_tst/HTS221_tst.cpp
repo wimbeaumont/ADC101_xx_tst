@@ -42,7 +42,7 @@ Serial pc(USBTX, USBRX);
 #include <cstdio>
 #include "DummyI2CInterface.h"	
 
-#endif __MBED__
+#endif //__MBED__
 
 #include "dev_interface_def.h"
 #include "hts221.h"
@@ -56,7 +56,7 @@ MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 #else 
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
-#endif
+#endif //__MBED__
 
 
 I2CInterface* i2cdev= mbedi2cp;

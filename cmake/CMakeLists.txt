@@ -15,13 +15,18 @@ project(cmaketry_project  )
 
 # generate the lib 
 
-file(GLOB_RECURSE simplelibs  ../../PeripheralDevices/*/*cpp  ../../PeripheralDevices/*/*h )
+file(GLOB_RECURSE simplelibs  ../../PeripheralDevices/*.cpp  ../../PeripheralDevices/*.h )
 # for the moment don't include  MCP4728setaddr.cpp 
+
+#message ( "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728//MCP4728setaddr.cpp" )
+
+
 message( ${simplelibs})
-message ( "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.cpp" )
-list(REMOVE_ITEM simplelibs "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.cpp")
-list(REMOVE_ITEM simplelibs "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.h")
-message( ${simplelibs})
+
+
+list(REMOVE_ITEM simplelibs "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.h")
+
+
 add_library(tstlib SHARED ${simplelibs})
 target_include_directories(tstlib PUBLIC  ../../PeripheralDevices/DevInterfaces/)
 #set_target_properties(tstlib PROPERTIES LINKER_LANGUAGE CXX)
