@@ -2,20 +2,20 @@
  *
  *  for more info see the README.MD of the repository 
  *  https://github.com/wimbeaumont/peripheral_dev_tst.git
- *  ver  0.22  updated to the last mbed , see if mbed studio accepts now
  * 
- *  check addresses connected, read them 
- * (C) Wim Beaumont Universiteit Antwerpen 2017 2019 
+ *  reads temperature and ee-prom 
+ *  (C) Wim Beaumont Universiteit Antwerpen 2017 2019 
  *
  *  ver  0.22  updated to the last mbed , see if mbed studio accepts now
  *  ver  0.30  usage for github and other environments
+ *  ver  0.31  usage for github added __LINUX__ use ( real i2c dev) 
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define AT30TSE753EXAMPLEVER "0.22"
+#define AT30TSE753EXAMPLEVER "0.31"
 
-#ifdef __MBED__ 
+#if defined  __MBED__ 
 
 #include "mbed.h"
 
@@ -36,7 +36,13 @@ Serial pc(USBTX, USBRX);
 
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
-#else  // __MBED__ 
+
+#elif defined __LINUX__  
+#include <cstdio>
+#include <cstdlib>
+#include "LinuxI2CInterface.h"
+
+#else 
 #include <cstdio>
 #include <cstdlib>
 #include "DummyI2CInterface.h"
@@ -47,10 +53,16 @@ Serial pc(USBTX, USBRX);
 #include "AT30TSE75x.h"
 
 
-#ifdef __MBED__ 
+#if defined  __MBED__ 
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
+#elif defined  __LINUX__ 
+
+LinuxI2CInterface  mbedi2c("/dev/i2c-2");
+LinuxI2CInterface* mbedi2cp= &mbedi2c;
+
 #else 
+
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
 #endif

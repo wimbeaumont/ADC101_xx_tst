@@ -21,8 +21,29 @@ file(GLOB_RECURSE simplelibs  ../../PeripheralDevices/*.cpp  ../../PeripheralDev
 #message ( "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728//MCP4728setaddr.cpp" )
 
 
-message( ${simplelibs})
+# message( ${simplelibs})
 
+# check if there is a i2c device  
+# to compile for dummy cmake . -DDUMMY=true 
+# but once used , make sure you remove it from cache or cmake . -DDUMMY=FALSE 
+if ( DUMMY )
+message ("compile for dummy") 
+set( TARGET_FLAG DUMMY) 
+else()
+	if (UNIX) 
+		if ( EXISTS "/dev/i2c-?")
+			set(TARGET_FLAG  LINUX)
+			message("compile for LINUX i2cdev")
+		else() 
+       			set(TARGET_FLAG  DUMMY )
+			message ("compile for dummy") 
+
+		endif()
+	else()
+		message("build for MBED not supported ") 
+		exit()
+	endif() 
+endif()
 
 list(REMOVE_ITEM simplelibs "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../../PeripheralDevices/MCP4728/MCP4728setaddr.h")
 
@@ -68,7 +89,7 @@ foreach ( testprog ${ALLPROGS})
 	get_filename_component(testname  ${testprog} NAME_WE )
 	add_executable( ${testname}  ${testprog}  )
 	# just add some compiler flags
-	target_compile_options(${testname}  PUBLIC -std=c++1y -Wall)
+	target_compile_options(${testname}  PUBLIC -std=c++1y -Wall -D${TARGET_FLAG})
 	# this lets me include files relative to the root src dir with a <> pair
 	#target_include_directories(${testname} PUBLIC  ../../PeripheralDevices/*/)
 	target_include_directories(${testname} PUBLIC  ${dev_incl_dirs}  )
