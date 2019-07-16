@@ -9,13 +9,18 @@
  *  ver  0.22  updated to the last mbed , see if mbed studio accepts now
  *  ver  0.30  usage for github and other environments
  *  ver  0.31  usage for github added __LINUX__ use ( real i2c dev) 
+ *  ver  0.32  prints selected "platorm"
+ *  ver  0.34  used new error reporter 
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
 #define AT30TSE753EXAMPLEVER "0.31"
 
+
 #if defined  __MBED__ 
+
+#define  OS_SELECT "MBED" 
 
 #include "mbed.h"
 
@@ -58,13 +63,16 @@ MBEDI2CInterface mbedi2c( SDA, SCL);
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 #elif defined  __LINUX__ 
 
-LinuxI2CInterface  mbedi2c("/dev/i2c-2");
+char *filename = (char*)"/dev/i2c-1";
+LinuxI2CInterface  mbedi2c(filename);
 LinuxI2CInterface* mbedi2cp= &mbedi2c;
+#define  OS_SELECT "linux_i2c" 
 
 #else 
 
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
+#define  OS_SELECT "linux_dummy" 
 #endif
 
 
@@ -92,16 +100,22 @@ int main(void) {
    
    printf("AT30TSE752  example program version %s, compile date %s time %s\n\r",AT30TSE753EXAMPLEVER,__DATE__,__TIME__);
    printf("getVersion :%s\n\r ",gv.getversioninfo());
-   
+   printf("compiled for: %s\n\r ", OS_SELECT); 
    
    
    AT30TSE75x tid[8] ={ AT30TSE75x( i2cdev ,0), AT30TSE75x( i2cdev ,1),AT30TSE75x( i2cdev ,2) ,AT30TSE75x( i2cdev ,3),
                         AT30TSE75x( i2cdev ,4), AT30TSE75x( i2cdev ,5),AT30TSE75x( i2cdev ,6) ,AT30TSE75x( i2cdev ,7)};
    bool addrfound[8];
-   for (int lc=0; lc <7 ;lc++) {
-        printf ( "AT30SE75x version :%s\n\r ",tid[lc].getversioninfo());
+   printf ( "AT30SE75x version :%s\n\r ",tid[0].getversioninfo());   
+   for (int lc=0; lc <8 ;lc++) {
+
         printf( "Taddr %x , Eaddr %x  subaddr %d\n\r ", tid[lc].getTaddr(),tid[lc].getEaddr(), addr);
-        if( tid[lc].getInitStatus() ){ printf("reading config registers failed \n\r");addrfound[lc]=false; } 
+        if( tid[lc].getInitStatus() ){ 
+		addrfound[lc]=false; 
+		printf("reading config registers failed ");
+		printf("last: ack status:%d , i2cerr %d not supported %d \n\r",
+			(int)i2cdev->getLastAckStatus(),i2cdev->getLastComError(),(int)i2cdev->getNotSupported());
+	} 
         else {
             addrfound[lc]=true;   
             tid[lc].set_resolution(12 , i2cerr );

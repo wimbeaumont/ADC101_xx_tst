@@ -28,14 +28,14 @@ file(GLOB_RECURSE simplelibs  ../../PeripheralDevices/*.cpp  ../../PeripheralDev
 # but once used , make sure you remove it from cache or cmake . -DDUMMY=FALSE 
 if ( DUMMY )
 message ("compile for dummy") 
-set( TARGET_FLAG DUMMY) 
+set( TARGET_FLAG __DUMMY__) 
 else()
 	if (UNIX) 
-		if ( EXISTS "/dev/i2c-?")
-			set(TARGET_FLAG  LINUX)
+		if ( EXISTS "/dev/i2c-1")
+			set(TARGET_FLAG  __LINUX__)
 			message("compile for LINUX i2cdev")
 		else() 
-       			set(TARGET_FLAG  DUMMY )
+       			set(TARGET_FLAG  __DUMMY__ )
 			message ("compile for dummy") 
 
 		endif()
