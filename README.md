@@ -76,6 +76,8 @@ This is not very easy to use in general code. <br>
 As all the platforms I consider ( so including mbed) all support C++.  Plan is to use exceptions for I2C related errors ( like not implemented functions)<br> 
 For simple platforms , adrino , mbed exceptions are not very useful during run time as these  are ofted used to control systems , often stand alone. Preferable it could be "switch off"  with cmake to minimize the code complexity  but not yet figure out how to this in a nice way. The exceptions would be used during development ( and of course of platforms like a raspberry-PI ) 
 
+There is a class DevErrorReporter , inherited by the I2CInterface class.  The I2CInterface implementation can use this to get the status of the last error . So the main program can use the methods to debug .  
+
 
 ### the getVersion class
 
@@ -244,19 +246,41 @@ there  $>cmake .  -DDUMMY=true <br>
 then  $>make  <br> 
 
 ## linux i2c dev 
-If the /dev/i2c-? is found the make file will generate the make files to use the /dev/i2c-2 device ( hard coded for the moment to be changed) .
-For the moment no option to force this.
+If the /dev/i2c-1 is found the make file will generate the make file.  This is hard coded in the cmake so you have to edit this if you want to use an other device.
+
+There is a name clash of the dev read/ write function  and the I2CInterface (same name and parameters) .  To solve this I created a LinuxI2c class that handles the hardware access. 
 
 pitfall :  if you do first $>cmake .  -DDUMMY=true   , then use   >cmake .  -DDUMMY=false , because cmake keep the value in the  cache . 
+
+### directories 
+
+
+I made a directory ~/Pdev .  In this directory:
+
+git clone git@github.com:wimbeaumont/peripheral_dev_tst.git <br>
+git clone git@github.com:wimbeaumont/PeripheralDevices.git <br>
+
+( I have a ssh key on my github account) 
+
+cd ~/Pdev/peripheral_dev_tst/cmake<br>
+cmake .
+
+Then the test programs should be compiled.
+
 
 
 
 ## raspberry PI
 
-Tried the dummy Linux on the Pi  was working (had to install cmake ) 
-Should be the same as linux i2c dev 
+cmake is not defaul installed on the Raspberry Pi so you have to install it.  In the documentation there are also remarks that you have to activate the I2C device  ( but for the once I have it was always the case ).
 
-try to understand which I2C interface I have to use.  Most likely  i2c-dev   but not clear how to generate a single start or stop command. 
+
+The  same as linux i2c dev  so with the same limitations. 
+
+16 July 2019  I was able to read the temperature with the AT30TSE752
+
+Consider to use a library for the Broadcom chip, but first to see how the Raspberry Pi 4 will be supported. 
+
 
 
 ## other considered platforms 
