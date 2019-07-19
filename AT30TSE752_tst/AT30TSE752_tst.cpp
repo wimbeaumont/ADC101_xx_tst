@@ -50,7 +50,7 @@ MBEDI2CInterface mbedi2c( SDA, SCL);
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 
 //------------------ end MBED specific config
-#elif defined __LINUX__  OS_SELECT
+#elif defined __LINUX__ 
 
 #define  OS_SELECT "linux_i2c" 
 
