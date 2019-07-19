@@ -11,7 +11,11 @@
  
 
 #define MCP4728EXAMPLEVER "2.1"
-#ifdef __MBED__ 
+
+
+// OS / platform  specific  configs 
+#if defined  __MBED__ 
+#define  OS_SELECT "MBED" 
 
 #include "mbed.h"
 
@@ -28,12 +32,52 @@
   #error TARGET NOT DEFINED
 #endif
 
+// different pins can be used for the control of the programming of the MCP4728 
+
+//DigitalOut LDAC(PTA6);
+//DigitalOut CntPin(PTA7);
+
+Serial pc(USBTX, USBRX);
+
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
-#else  // __MBED__ 
+MBEDI2CInterface mbedi2c( SDA, SCL); 
+MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
+
+//------------------ end MBED specific config
+#elif defined __LINUX__  OS_SELECT
+
+#define  OS_SELECT "linux_i2c" 
+
 #include <cstdio>
+#include <cstdlib>
+#include "LinuxI2CInterface.h"
+
+char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 
+LinuxI2CInterface  mbedi2c(filename);
+LinuxI2CInterface* mbedi2cp= &mbedi2c;
+
+//------------------ end Linux I2C specific config
+#else 
+#define  OS_SELECT "linux_dummy" 
+
+#include <cstdio>
+#include <cstdlib>
 #include "DummyI2CInterface.h"
+DummyI2CInterface  mbedi2c;
+DummyI2CInterface* mbedi2cp= &mbedi2c;
+
+//DummyDigitalOut LDAC ;
+//DummyDigitalOut CntPin ;
+
+
 #endif  // __MBED__ 
+//------------------ end Linux dummy specific config
+#ifndef OS_SELECT 
+#define OS_SELECT "linux_dummy" 
+#endif
+// --- end platform specific configs 
+
 
 #include "DACInterface.h" 
 
@@ -42,27 +86,9 @@
 // #include "MCP4728setaddr.h"
 #include "mcp4728.h"
 
-#ifdef __MBED__ 
-MBEDI2CInterface mbedi2c( SDA, SCL); 
-MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
-#else 
-DummyI2CInterface  mbedi2c;
-DummyI2CInterface* mbedi2cp= &mbedi2c;
-#endif
 
 I2CInterface* i2cdev= mbedi2cp;
 const float Vdd=4.5;
-
-#ifdef __MBED__ 
-// different pins can be used for the control of the programming of the MCP4728 
-
-DigitalOut LDAC(PTA6);
-DigitalOut CntPin(PTA7);
-#else 
-#include "DummyDigitalOut.h" 	
-DummyDigitalOut LDAC ;
-DummyDigitalOut CntPin ;
-#endif 
 
 
 int main(void) {

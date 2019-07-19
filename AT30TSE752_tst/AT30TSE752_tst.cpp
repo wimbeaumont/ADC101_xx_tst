@@ -11,15 +11,20 @@
  *  ver  0.31  usage for github added __LINUX__ use ( real i2c dev) 
  *  ver  0.32  prints selected "platorm"
  *  ver  0.34  used new error reporter 
+ *  ver  0.40  tested with Raspberry PI 
+ *  ver  0.41  resuffel platform specific configuration part
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define AT30TSE753EXAMPLEVER "0.31"
+#define AT30TSE753EXAMPLEVER "0.41"
+
+#include "dev_interface_def.h"
+#include "AT30TSE75x.h"
 
 
+// OS / platform  specific  configs 
 #if defined  __MBED__ 
-
 #define  OS_SELECT "MBED" 
 
 #include "mbed.h"
@@ -41,39 +46,38 @@ Serial pc(USBTX, USBRX);
 
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
+MBEDI2CInterface mbedi2c( SDA, SCL); 
+MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 
-#elif defined __LINUX__  
+//------------------ end MBED specific config
+#elif defined __LINUX__  OS_SELECT
+
+#define  OS_SELECT "linux_i2c" 
+
 #include <cstdio>
 #include <cstdlib>
 #include "LinuxI2CInterface.h"
 
+char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 
+LinuxI2CInterface  mbedi2c(filename);
+LinuxI2CInterface* mbedi2cp= &mbedi2c;
+
+//------------------ end Linux I2C specific config
 #else 
+#define  OS_SELECT "linux_dummy" 
+
 #include <cstdio>
 #include <cstdlib>
 #include "DummyI2CInterface.h"
-#endif  // __MBED__ 
-
-
-#include "dev_interface_def.h"
-#include "AT30TSE75x.h"
-
-
-#if defined  __MBED__ 
-MBEDI2CInterface mbedi2c( SDA, SCL); 
-MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
-#elif defined  __LINUX__ 
-
-char *filename = (char*)"/dev/i2c-1";
-LinuxI2CInterface  mbedi2c(filename);
-LinuxI2CInterface* mbedi2cp= &mbedi2c;
-#define  OS_SELECT "linux_i2c" 
-
-#else 
-
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
-#define  OS_SELECT "linux_dummy" 
+
+#endif  // __MBED__ 
+//------------------ end Linux dummy specific config
+#ifndef OS_SELECT 
+#define OS_SELECT "linux_dummy" 
 #endif
+// --- end platform specific configs 
 
 
 I2CInterface* i2cdev= mbedi2cp;
