@@ -5,20 +5,27 @@
  *  copied from the mbed online compiler envionment 
  *  V 0.1  : tested on the KL25z 
  *  V 0.21 : heater added
- *  V 0.30  : removed tsi sensor , version for git hub and mbed-cli
- *  
+ *  V 0.30 : removed tsi sensor , version for git hub and mbed-cli
+ *  V 0.40 : version for Linux / Raspberry Pi 
  * (C) Wim Beaumont Universiteit Antwerpen 2017 2019
  *
  * License see
  * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define HTS221EXAMPLEVER "0.31"
+#define HTS221EXAMPLEVER "0.40"
 
-#ifdef __MBED__ 
+
+#include "dev_interface_def.h"
+#include "hts221.h"
+
+
+
+// OS / platform  specific  configs 
+#if defined  __MBED__ 
+#define  OS_SELECT "MBED" 
 
 #include "mbed.h"
-
 
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
   PinName const SDA = PTE0;
@@ -32,31 +39,44 @@
 #else
   #error TARGET NOT DEFINED
 #endif
+
 Serial pc(USBTX, USBRX);
 
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
-
-#else 
-
-#include <cstdio>
-#include "DummyI2CInterface.h"	
-
-#endif //__MBED__
-
-#include "dev_interface_def.h"
-#include "hts221.h"
-
-
-
-
-#ifdef __MBED__ 
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
+
+//------------------ end MBED specific config
+#elif defined __LINUX__
+
+#define  OS_SELECT "linux_i2c" 
+
+#include <cstdio>
+#include <cstdlib>
+#include "LinuxI2CInterface.h"
+
+char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 
+LinuxI2CInterface  mbedi2c(filename);
+LinuxI2CInterface* mbedi2cp= &mbedi2c;
+
+//------------------ end Linux I2C specific config
 #else 
+#define  OS_SELECT "linux_dummy" 
+
+#include <cstdio>
+#include <cstdlib>
+#include "DummyI2CInterface.h"
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
-#endif //__MBED__
+
+#endif  // __MBED__ 
+//------------------ end Linux dummy specific config
+#ifndef OS_SELECT 
+#define OS_SELECT "linux_dummy" 
+#endif
+// --- end platform specific configs 
+
 
 
 I2CInterface* i2cdev= mbedi2cp;

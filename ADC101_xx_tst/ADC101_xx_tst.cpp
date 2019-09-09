@@ -1,10 +1,11 @@
 /** 
-*  program to test the ADC101_xx  class 
-*  for more info see the README.MD of the repository 
-*  https://github.com/wimbeaumont/peripheral_dev_tst.git
-*  copied from the mbed online compiler envionment 
-*  ver 0.3  compiled in mbed-cli envionment for the KL025Z 
-*  ver 0.4  code for outside mbed environment removed led control
+* program to test the ADC101_xx  class 
+* for more info see the README.MD of the repository 
+* https://github.com/wimbeaumont/peripheral_dev_tst.git
+* copied from the mbed online compiler envionment 
+* ver 0.3  compiled in mbed-cli envionment for the KL025Z 
+* ver 0.4  code for outside mbed environment removed led control
+* ver 0.50  : version for Linux / Raspberry Pi  
 * (C) Wim Beaumont Universiteit Antwerpen  2019
 * License see
 * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
@@ -16,13 +17,24 @@
 #endif
 
 
-#define ADC101_xx_test_ver  "0.4"
+#define ADC101_xx_test_ver  "0.50"
 
 
-#ifdef __MBED__ 
+
+#include "dev_interface_def.h"
+
+#include "ADC101_xx.h"
+
+
+// OS / platform  specific  configs 
+#if defined  __MBED__ 
+#define  OS_SELECT "MBED" 
+
+#include "mbed.h"
+
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
-  PinName const SDA = PTE25;
-  PinName const SCL = PTE24;
+  PinName const SDA = PTE0;
+  PinName const SCL = PTE1;
 #elif defined (TARGET_KL05Z)
   PinName const SDA = PTB4;
   PinName const SCL = PTB3;
@@ -32,44 +44,48 @@
 #else
   #error TARGET NOT DEFINED
 #endif
-#endif 
 
-#ifdef __MBED__ 
+Serial pc(USBTX, USBRX);
+
 #include "I2C.h"
-#include "MBEDI2CInterface.h" 
-#else 
-#include <cstdio>
-#include "DummyI2CInterface.h"
-#endif
-
-
-
-#include "DACInterface.h" 
-#include "dev_interface_def.h"
-
-#include "ADC101_xx.h"
-
-#ifdef __MBED__ 
+#include "MBEDI2CInterface.h"  
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
+
+//------------------ end MBED specific config
+#elif defined __LINUX__
+
+#define  OS_SELECT "linux_i2c" 
+
+#include <cstdio>
+#include <cstdlib>
+#include "LinuxI2CInterface.h"
+
+char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 
+LinuxI2CInterface  mbedi2c(filename);
+LinuxI2CInterface* mbedi2cp= &mbedi2c;
+
+//------------------ end Linux I2C specific config
 #else 
+#define  OS_SELECT "linux_dummy" 
+
+#include <cstdio>
+#include <cstdlib>
+#include "DummyI2CInterface.h"
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
+
+#endif  // __MBED__ 
+//------------------ end Linux dummy specific config
+#ifndef OS_SELECT 
+#define OS_SELECT "linux_dummy" 
 #endif
-
-
+// --- end platform specific configs 
 
 
 
 I2CInterface* i2cdev= mbedi2cp;
 const float Vdd=3.293;
-
-
-#ifdef __MBED__ 
-Serial pc(USBTX, USBRX);
-#endif
-
-
 
 
 
