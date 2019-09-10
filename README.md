@@ -1,6 +1,6 @@
 # peripheral_dev_tst
 
-## Table of Contents
+# Table of Contents
 * [Introduction](#Introduction)
 	* [why C ?](#why-C-?)
 * [general remarks ](#general-remarks-)
@@ -14,15 +14,15 @@
 	* [MCP23009](#MCP23009)
 	* [MCP4725](#MCP4725)
 	* [MCP4728_tst](#MCP4728_tst)
+	* [VEML7700_tst](#VEML7700_tst)
 * [MBED](#MBED)
 	* [preparations](#preparations)
 	* [generating the programming files](#generating-the-programming-files)
 * [dummy  Linux](#dummy--Linux)
 * [linux i2c dev ](#linux-i2c-dev-)
+	* [directories ](#directories-)
 * [raspberry PI](#raspberry-PI)
 * [other considered platforms ](#other-considered-platforms-)
-
-
 
 
 
@@ -140,6 +140,13 @@ if you want to program the I2C address check this  project<br>
 https://os.mbed.com/users/wbeaumont/code/MCP4728test/
 
 Be sure you select the correct pins for the IO.  
+
+### VEML7700_tst
+
+Lux meter :  https://www.vishay.com/ppg?84286
+
+tested on the KL05Z  , most functions are in.  No detailed power mode handling 
+also included function that calculates the lux. 
 
 
 
