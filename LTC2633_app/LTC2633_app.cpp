@@ -1,15 +1,17 @@
-/** example program for the use of the LTC2633 class and DACInterface.h classes
+/** program to controll the bias and trigger levels for a two channel 
+ *  SiPm readout board 
  *  for more info see the README.MD of the repository 
  *  https://github.com/wimbeaumont/peripheral_dev_tst.git
  *
- *  V 1.0  : nov 2019 copied from MCP4728_test 
- * (C) Wim Beaumont Universiteit Antwerpen 2016 
+ *  V 1.0  : copied from LTC2633_tst.cpp 
+ *  V 1.24  : working with the hardware simple increasing
+ * (C) Wim Beaumont Universiteit Antwerpen 2019
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
  
 
-#define LTC2633EXAMPLEVER "2.1"
+#define LTC2633_SIPM_CTRL "1.30"
 
 
 // OS / platform  specific  configs 
@@ -80,64 +82,74 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 
 
 I2CInterface* i2cdev= mbedi2cp;
-const float Vdd=4.5;
+const float Vrefext=5.0;
 
 
 int main(void) {
   
    // get the version of getVersion 
    getVersion gv;
-   int addr= 00;
-   printf("LTC2633 example program version %s, compile date %s time %s\n\r",LTC2633EXAMPLEVER,__DATE__,__TIME__);
+   int bias_ctrl_addr= 0x12;  //CAO at 5 Vdd
+   int discr_lvl_addr= 0x10;  //CAO at 0 Vdd
+   printf("SiPm ctrl version %s, compile date %s time %s for OS %s\n\r",LTC2633_SIPM_CTRL,__DATE__,__TIME__,OS_SELECT);
    printf("getVersion :%s\n\r ",gv.getversioninfo());
-
-   LTC2633  dac(i2cdev, addr,  Vdd , Vreftype=0, resolution=12  );
-   printf("\n\raddr %d LTC2633 :%s\n\r",addr,dac.getversioninfo());
+   printf("I2C interface version  :%s\n\r ",i2cdev->getversioninfo());
+   int Vreftype=1 , resolution=12;
+   LTC2633  biasctrl(i2cdev, bias_ctrl_addr,  Vrefext ,Vreftype , resolution  );
+   LTC2633  discr_lvl(i2cdev, discr_lvl_addr,  Vrefext ,Vreftype , resolution  );
+   printf("\n\raddr %d LTC2633 :%s\n\r", bias_ctrl_addr,biasctrl.getversioninfo());
    i2cdev->wait_for_ms(1000);
-   float voltage=0;
+      int errcode;
    int cnt=0;
    while(cnt < 4096){
-           // first set the 4 channels 
+           // first set the 2 channels 
            for ( int cc =0 ; cc <2 ; cc++) { 
-               if ( dac.setDACvalue(cnt,cc) )
-                   printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
+               errcode= biasctrl.setDACvalue(cnt,cc);  
+               if (errcode )
+                   printf("failed to set biasctrl value %d for channel %d errcode %d\n\r",cnt,cc,errcode);
+                errcode= discr_lvl.setDACvalue(cnt,cc);
+                if ( errcode )
+                   printf("failed to set  dsicr lvl value %d for channel%d errcode %d \n\r",cnt,cc,errcode);
             }
-            printf("set to %d result ",cnt);
+            printf("set to %d result\n\r ",cnt);
                // no else read anyway even if set fails 
-            if(dac.update()) printf("\n\rfailed to readback channel info (should fail not implemented for LT2633  \n\r");
+/*            if(biasctrl.update()) printf("\n\rfailed to readback channel info (should fail not implemented for LT2633  \n\r");
             else {
                 for ( int cc =0 ; cc <4 ; cc++) { 
-                 (void)dac.getVoltage(voltage,cc);//no need to test done with updat 
+                 (void)biasctrl.getVoltage(voltage,cc);//no need to test done with updat 
                   printf(" CH%d %f[V]",cc,voltage);
                 }
                 printf("\n\r");
             }
-             cnt++;
+*/             cnt++;
              cnt=cnt % 4096;     
-             i2cdev->wait_for_ms(1200);
+             i2cdev->wait_for_ms(200);
 
   }
 
   // now the same with the DAC interface 
-  DACInterface* di = &dac;
+  DACInterface* bi = &biasctrl;
+  DACInterface* li = &discr_lvl;
   cnt=0;
   while(1){
            // first set the 4 channels 
-           for ( int cc =0 ; cc <4 ; cc++) { 
-               if ( di->setDACvalue(cnt,cc) )
+           for ( int cc =0 ; cc <2 ; cc++) { 
+               if ( bi->setDACvalue(cnt,cc) )
+                   printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
+			   if ( li->setDACvalue(cnt,cc) )
                    printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
             }
             printf("set DAC value  to %d result in",cnt);
                // no else read anyway even if set fails 
-            if(di->update()) printf("\n\rfailed to readback channel info \n\r");
+/*            if(bi->update()) printf("\n\rfailed to readback channel info \n\r");
             else {
                 for ( int cc =0 ; cc <4 ; cc++) { 
-                 (void)di->getVoltage(voltage,cc);// no need to test done with update
+                 (void)bi->getVoltage(voltage,cc);// no need to test done with update
                   printf(" CH%d %f[V]",cc,voltage);
                 }
                 printf("\n\r");
             }
-            
+*/            
              cnt++;
              cnt=cnt % 4096;     
              i2cdev->wait_for_ms(200);

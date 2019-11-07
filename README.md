@@ -11,6 +11,7 @@
 	* [ADC101_xx](#ADC101_xx)
 	* [AT30TSE752](#AT30TSE752)
 	* [HTS221](#HTS221)
+	* [LTC2533 ](#LTC2533-)
 	* [MCP23009](#MCP23009)
 	* [MCP4725](#MCP4725)
 	* [MCP4728_tst](#MCP4728_tst)
@@ -114,6 +115,13 @@ https://www.st.com/content/st_com/en/products/mems-and-sensors/humidity-sensors/
 
 For the price it is a good sensor , we use it in the SOLID experiment to monitor humidity and temperatures on several places.  <br>
 Pitty the package can not (at all ?) soldered manual. But as we used many of this I had to make a small PCB.  
+
+### LTC2533 
+
+A DAC   from 8 to 12 bits depending on the ordering. 
+Data sheet https://www.analog.com/en/products/ltc2633.html
+Will be used for a student project  . 
+
 
 ### MCP23009
 

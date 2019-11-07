@@ -2,14 +2,16 @@
  *  for more info see the README.MD of the repository 
  *  https://github.com/wimbeaumont/peripheral_dev_tst.git
  *
- *  V 1.0  : nov 2019 copied from MCP4728_test 
- * (C) Wim Beaumont Universiteit Antwerpen 2016 
+ *  V 2.1  : nov 2019 copied from MCP4728_test  is 2.1 inital because forgot to set it to 1.0 
+ *  V 2.2  : nov 2019 some changes in comments , 
+			 small not functional changes tested on hardware with MBED _KL25Z
+ * (C) Wim Beaumont Universiteit Antwerpen 2019 
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
  
 
-#define LTC2633EXAMPLEVER "2.1"
+#define LTC2633EXAMPLEVER "2.2"
 
 
 // OS / platform  specific  configs 
@@ -80,24 +82,24 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 
 
 I2CInterface* i2cdev= mbedi2cp;
-const float Vdd=4.5;
+const float Vrefext=5.0;
 
 
 int main(void) {
   
    // get the version of getVersion 
    getVersion gv;
-   int addr= 00;
+   int addr= 0x10; //8 bits address  assume CAO is connected to ground  (global address is 0x73
    printf("LTC2633 example program version %s, compile date %s time %s\n\r",LTC2633EXAMPLEVER,__DATE__,__TIME__);
    printf("getVersion :%s\n\r ",gv.getversioninfo());
-   int Vreftype=0 , resolution=12;
-   LTC2633  dac(i2cdev, addr,  Vdd , 0, 12  );
+   int Vreftype=1 , resolution=12;
+   LTC2633  dac(i2cdev, addr,  Vrefext ,Vreftype , resolution  );
    printf("\n\raddr %d LTC2633 :%s\n\r",addr,dac.getversioninfo());
    i2cdev->wait_for_ms(1000);
-   float voltage=0;
+   float voltage;
    int cnt=0;
    while(cnt < 4096){
-           // first set the 4 channels 
+           // first set the 2 channels 
            for ( int cc =0 ; cc <2 ; cc++) { 
                if ( dac.setDACvalue(cnt,cc) )
                    printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
@@ -114,7 +116,7 @@ int main(void) {
             }
              cnt++;
              cnt=cnt % 4096;     
-             i2cdev->wait_for_ms(1200);
+             i2cdev->wait_for_ms(200);
 
   }
 
@@ -123,7 +125,7 @@ int main(void) {
   cnt=0;
   while(1){
            // first set the 4 channels 
-           for ( int cc =0 ; cc <4 ; cc++) { 
+           for ( int cc =0 ; cc <2 ; cc++) { 
                if ( di->setDACvalue(cnt,cc) )
                    printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
             }
