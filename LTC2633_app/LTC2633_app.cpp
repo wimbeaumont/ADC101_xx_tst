@@ -5,13 +5,14 @@
  *
  *  V 1.0  : copied from LTC2633_tst.cpp 
  *  V 1.24  : working with the hardware simple increasing
+ *  V 1.63  : with commands via the serial interface,   MBED targeting . 
  * (C) Wim Beaumont Universiteit Antwerpen 2019
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
  
 
-#define LTC2633_SIPM_CTRL "1.30"
+#define LTC2633_SIPM_CTRL "1.63"
 
 
 // OS / platform  specific  configs 
@@ -81,82 +82,162 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 #include "ltc2633.h"
 
 
+//#include <stdlib.h>
+
+
+
+#define MAX_ARG 5
+#define BUFFSIZE 14 
+
+class decodecmd {
+
+
+public :
+enum DEVSEL {BIAS=0 , LVL=1 ,INVALIDDEV=99 } ;
+enum ACTIONTYPE { NOACT=0, SETDAC_V=1 , SETDAC_D=2 , INVALIDACT=99 };
+
+int ch;
+DEVSEL device;
+float value;
+char response[30];
+ACTIONTYPE action;
+char* splitstr[MAX_ARG];
+char splstr0[BUFFSIZE],splstr1[BUFFSIZE],splstr2[BUFFSIZE],splstr3[BUFFSIZE],splstr4[BUFFSIZE];
+
+decodecmd(){
+	splitstr[0]=splstr0;
+	splitstr[1]=splstr1;
+	splitstr[2]=splstr2;
+	splitstr[3]=splstr3;
+	splitstr[4]=splstr4;
+};
+
+
+int   splitcmdstr(const char* s, const char& c){
+	
+    char buff[BUFFSIZE];
+	int bufcnt=0;
+	int bufcharcnt=0;
+	unsigned int k=strlen(s);
+    for (unsigned int i = 0; i < k /*strlen(s) */&& bufcnt < MAX_ARG; i++) {
+        char n=s[i];
+        if(n != c && bufcharcnt < BUFFSIZE-1 ) buff[bufcharcnt++]=n; else
+        	if(strlen(buff) != 0) {buff[bufcharcnt]='\0'; bufcharcnt=0; strcpy( splitstr[bufcnt++],buff); }
+    }
+	return bufcnt;
+}
+
+
+
+
+void request_action(char* reqtype ,char* dev_str , char* ch_str, char* value_str  ){
+    if ( strcmp(reqtype, "VER") == 0 ) {action=NOACT;  value= 1.0; ;strcpy(response,reqtype);  return; }
+    if ( strcmp(reqtype, "RES") == 0 ) {action=NOACT; strcpy(response,reqtype); return ; }
+    if ( strcmp(reqtype, "TST") == 0 ) { action=NOACT; value=1.23 ; strcpy(response,reqtype); ; return;}
+    strcpy(response,"reqerr"); action=INVALIDACT;
+}
+
+
+
+void ch_assign(char* dev , char* chstr  ){
+		strcpy(response,"success"); // assume success
+        device=INVALIDDEV;
+        if (  strcmp(dev, "BIAS") == 0 ) { device = BIAS;}
+        else if ( strcmp(dev, "LVL") == 0  ) {  device =LVL; }
+        if (device== INVALIDDEV ) { strcpy(response,"devselerr");}
+        else if (strcmp(chstr,"0")==0 ) { ch=0; }
+             else if (strcmp(chstr,"1")==0 ) { ch=1; }
+                 else { ch =-1; strcpy(response,"chselerr"); }
+}
+
+void set_action( char* settype ,char* dev_str , char*  ch_str, char* value_str  ){
+    strcpy(response,"seterr");
+    action = INVALIDACT;
+    if ( strcmp(settype,"V")==0  || strcmp(settype,"D")==0 ) {
+    	if ( strcmp(settype,"V")==0)  action =SETDAC_V; else action =SETDAC_D;
+        ch_assign( dev_str, ch_str) ;
+        value = atof( value_str); // no check if it is a correct float
+        strcpy(response,"success");
+    }
+
+}
+
+
+void  handle_cmd (const char*  cmdstr  ) {
+    int rcmd =0; // invalid cmd
+    strcpy(response,"unknown");
+    if ( splitcmdstr( cmdstr, ':') == 5) {
+        if ( strlen(splitstr[0]) == 1){  // if not cmd is invalid
+          if ( splitstr[0][0] == '?' ) rcmd=1; // request
+          if ( splitstr[0][0] == '!' ) rcmd=2; // set
+          switch (rcmd ) {
+              case 0 :  {strcpy(response , "invalid") ;}  break;
+              case 1 :  { request_action(splitstr[1],splitstr[2],splitstr[3],splitstr[4]); } break;
+              case 2 :  {     set_action(splitstr[1],splitstr[2],splitstr[3],splitstr[4]); } break;
+              default : {strcpy(response , "unkown") ;}  break;
+           }
+        }
+    } else {strcpy(response ,"cmdformaterr") ; action=INVALIDACT; device=INVALIDDEV ; ch =-1;     }
+}
+
+} ;// end class
+
+
 I2CInterface* i2cdev= mbedi2cp;
 const float Vrefext=5.0;
+
+using namespace std;
 
 
 int main(void) {
   
-   // get the version of getVersion 
-   getVersion gv;
    int bias_ctrl_addr= 0x12;  //CAO at 5 Vdd
    int discr_lvl_addr= 0x10;  //CAO at 0 Vdd
    printf("SiPm ctrl version %s, compile date %s time %s for OS %s\n\r",LTC2633_SIPM_CTRL,__DATE__,__TIME__,OS_SELECT);
-   printf("getVersion :%s\n\r ",gv.getversioninfo());
    printf("I2C interface version  :%s\n\r ",i2cdev->getversioninfo());
    int Vreftype=1 , resolution=12;
    LTC2633  biasctrl(i2cdev, bias_ctrl_addr,  Vrefext ,Vreftype , resolution  );
+   int errcode=biasctrl.setDACvalue(0,0);biasctrl.setDACvalue(0,1);
    LTC2633  discr_lvl(i2cdev, discr_lvl_addr,  Vrefext ,Vreftype , resolution  );
-   printf("\n\raddr %d LTC2633 :%s\n\r", bias_ctrl_addr,biasctrl.getversioninfo());
+   printf("\n\raddr %d err %d , LTC2633 :%s\n\r", bias_ctrl_addr,errcode,biasctrl.getversioninfo());
    i2cdev->wait_for_ms(1000);
-      int errcode;
-   int cnt=0;
-   while(cnt < 4096){
-           // first set the 2 channels 
-           for ( int cc =0 ; cc <2 ; cc++) { 
-               errcode= biasctrl.setDACvalue(cnt,cc);  
-               if (errcode )
-                   printf("failed to set biasctrl value %d for channel %d errcode %d\n\r",cnt,cc,errcode);
-                errcode= discr_lvl.setDACvalue(cnt,cc);
-                if ( errcode )
-                   printf("failed to set  dsicr lvl value %d for channel%d errcode %d \n\r",cnt,cc,errcode);
-            }
-            printf("set to %d result\n\r ",cnt);
-               // no else read anyway even if set fails 
-/*            if(biasctrl.update()) printf("\n\rfailed to readback channel info (should fail not implemented for LT2633  \n\r");
-            else {
-                for ( int cc =0 ; cc <4 ; cc++) { 
-                 (void)biasctrl.getVoltage(voltage,cc);//no need to test done with updat 
-                  printf(" CH%d %f[V]",cc,voltage);
-                }
-                printf("\n\r");
-            }
-*/             cnt++;
-             cnt=cnt % 4096;     
-             i2cdev->wait_for_ms(200);
-
-  }
-
-  // now the same with the DAC interface 
-  DACInterface* bi = &biasctrl;
-  DACInterface* li = &discr_lvl;
-  cnt=0;
-  while(1){
-           // first set the 4 channels 
-           for ( int cc =0 ; cc <2 ; cc++) { 
-               if ( bi->setDACvalue(cnt,cc) )
-                   printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
-			   if ( li->setDACvalue(cnt,cc) )
-                   printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
-            }
-            printf("set DAC value  to %d result in",cnt);
-               // no else read anyway even if set fails 
-/*            if(bi->update()) printf("\n\rfailed to readback channel info \n\r");
-            else {
-                for ( int cc =0 ; cc <4 ; cc++) { 
-                 (void)bi->getVoltage(voltage,cc);// no need to test done with update
-                  printf(" CH%d %f[V]",cc,voltage);
-                }
-                printf("\n\r");
-            }
-*/            
-             cnt++;
-             cnt=cnt % 4096;     
-             i2cdev->wait_for_ms(200);
-
-  }
+   
+	  // now the same with the DAC interface 
+  DACInterface* di[2] = {  &biasctrl,&discr_lvl};
   
-    
+  decodecmd cmd; // no init
+   char cmdinchar[50] ;
+ 
+   while ( 1) {
+		scanf("%s",cmdinchar);
+		cmdinchar[49]='\0';
+		//printf( "%s", cmdinchar);
+		cmd.handle_cmd ( cmdinchar) ;
+		switch ( cmd.action) {
+			case decodecmd::SETDAC_D : {
+					 if ( di[(int)cmd.device]->setDACvalue((int)cmd.value, cmd.ch) ) {
+						 strcpy(cmdinchar,"i2cerr");
+					 }else {
+						 strcpy(cmdinchar,cmd.response);
+						 strcat(cmdinchar,"_I2C");
+					 }
+			} break;
+			case decodecmd::SETDAC_V : {
+					 int  voltset;
+					 if( cmd.device ==  decodecmd::BIAS ) { cmd.value =  cmd.value/0.0342 ;}
+					 if ( di[(int)cmd.device]->setDACvalue((int)cmd.value, cmd.ch) ) {
+						 strcpy(cmdinchar,"i2cerr");
+					 }else {
+						 strcpy(cmdinchar,cmd.response);
+						 strcat(cmdinchar,"_I2C");
+					 }
+			} break; 				
+			default :	strcpy(cmdinchar,cmd.response);
+		};
+		cmdinchar[49]='\0';
+		printf( "%d:%f:%s",(int)cmd.action,cmd.value, cmdinchar);
+   }
+  
     // never reach this   
     return 1;
 }   
