@@ -1,5 +1,8 @@
 /** program to controll the bias and trigger levels for a two channel 
  *  SiPm readout board 
+ *  It compiles with Linux ( Raspberry Pi) and most likely it will work typing in the correct 
+ *  command , but it is mainly targeting the MBED serial communication. (as intital test program to debug the board) 
+ *  for the Raspberry I started with the file SiPmCtrl 
  *  for more info see the README.MD of the repository 
  *  https://github.com/wimbeaumont/peripheral_dev_tst.git
  *
@@ -46,6 +49,7 @@ MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 
 #include <cstdio>
 #include <cstdlib>
+#include <string.h>
 #include "LinuxI2CInterface.h"
 
 char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 

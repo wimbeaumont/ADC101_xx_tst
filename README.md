@@ -267,6 +267,9 @@ There is a name clash of the dev read/ write function  and the I2CInterface (sam
 
 pitfall :  if you do first $>cmake .  -DDUMMY=true   , then use   >cmake .  -DDUMMY=false , because cmake keep the value in the  cache . 
 
+As I have no Linux computers with I2C I can only test it on Raspberry Pi 
+
+
 ### directories 
 
 
@@ -278,9 +281,10 @@ git clone git@github.com:wimbeaumont/PeripheralDevices.git <br>
 ( I have a ssh key on my github account) 
 
 cd ~/Pdev/peripheral_dev_tst/cmake<br>
-cmake .
+cmake .  ( notice the . ) 
 
-Then the test programs should be compiled.
+Then the test programs should be compiled with 
+make ( in the cmake directorie) 
 
 
 
