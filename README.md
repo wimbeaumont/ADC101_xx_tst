@@ -248,6 +248,10 @@ for more info this is a nice page:
 
 https://os.mbed.com/docs/mbed-os/v5.12/tools/working-with-mbed-cli.html
 
+Most of  the MBED enabled devices I used are the FRDM KL25Z  and FRDM KL05Z  mainly as sensor readout interface for projects. These projects runs on Linux machines.  But connecting these devices ( and perhaps other MBED platforms ) don't work nicely with Windows 10.  Seems I have now one FRDM KL25Z connecting "stable" to windows 10.  See my FRDM on Windows 10 readme. 
+
+
+
 ## dummy  Linux
 
 This is a version to compile / develop with a full develop system ( standard linux desktop environment) <br> 
