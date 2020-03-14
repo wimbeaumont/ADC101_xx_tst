@@ -1,6 +1,6 @@
 # peripheral_dev_tst
 
-## Table of Contents
+# Table of Contents
 * [Introduction](#Introduction)
 	* [why C ?](#why-C-?)
 * [general remarks ](#general-remarks-)
@@ -11,18 +11,19 @@
 	* [ADC101_xx](#ADC101_xx)
 	* [AT30TSE752](#AT30TSE752)
 	* [HTS221](#HTS221)
+	* [LTC2533 ](#LTC2533-)
 	* [MCP23009](#MCP23009)
 	* [MCP4725](#MCP4725)
 	* [MCP4728_tst](#MCP4728_tst)
+	* [VEML7700_tst](#VEML7700_tst)
 * [MBED](#MBED)
 	* [preparations](#preparations)
 	* [generating the programming files](#generating-the-programming-files)
 * [dummy  Linux](#dummy--Linux)
 * [linux i2c dev ](#linux-i2c-dev-)
+	* [directories ](#directories-)
 * [raspberry PI](#raspberry-PI)
 * [other considered platforms ](#other-considered-platforms-)
-
-
 
 
 
@@ -115,6 +116,13 @@ https://www.st.com/content/st_com/en/products/mems-and-sensors/humidity-sensors/
 For the price it is a good sensor , we use it in the SOLID experiment to monitor humidity and temperatures on several places.  <br>
 Pitty the package can not (at all ?) soldered manual. But as we used many of this I had to make a small PCB.  
 
+### LTC2533 
+
+A DAC   from 8 to 12 bits depending on the ordering. 
+Data sheet https://www.analog.com/en/products/ltc2633.html
+Will be used for a student project  . 
+
+
 ### MCP23009
 
 I2C IO extender . 5.5 V tolerant  <br>
@@ -140,6 +148,13 @@ if you want to program the I2C address check this  project<br>
 https://os.mbed.com/users/wbeaumont/code/MCP4728test/
 
 Be sure you select the correct pins for the IO.  
+
+### VEML7700_tst
+
+Lux meter :  https://www.vishay.com/ppg?84286
+
+tested on the KL05Z  , most functions are in.  No detailed power mode handling 
+also included function that calculates the lux. 
 
 
 
@@ -233,6 +248,10 @@ for more info this is a nice page:
 
 https://os.mbed.com/docs/mbed-os/v5.12/tools/working-with-mbed-cli.html
 
+Most of  the MBED enabled devices I used are the FRDM KL25Z  and FRDM KL05Z  mainly as sensor readout interface for projects. These projects runs on Linux machines.  But connecting these devices ( and perhaps other MBED platforms ) don't work nicely with Windows 10.  Seems I have now one FRDM KL25Z connecting "stable" to windows 10.  See my FRDM on Windows 10 readme. 
+
+
+
 ## dummy  Linux
 
 This is a version to compile / develop with a full develop system ( standard linux desktop environment) <br> 
@@ -252,6 +271,9 @@ There is a name clash of the dev read/ write function  and the I2CInterface (sam
 
 pitfall :  if you do first $>cmake .  -DDUMMY=true   , then use   >cmake .  -DDUMMY=false , because cmake keep the value in the  cache . 
 
+As I have no Linux computers with I2C I can only test it on Raspberry Pi 
+
+
 ### directories 
 
 
@@ -263,9 +285,10 @@ git clone git@github.com:wimbeaumont/PeripheralDevices.git <br>
 ( I have a ssh key on my github account) 
 
 cd ~/Pdev/peripheral_dev_tst/cmake<br>
-cmake .
+cmake .  ( notice the . ) 
 
-Then the test programs should be compiled.
+Then the test programs should be compiled with 
+make ( in the cmake directorie) 
 
 
 
