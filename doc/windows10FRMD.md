@@ -60,9 +60,41 @@ Also realise that regedit acts DIRECTLY on the register.  So there is no save or
    * set the name of the new entry to DisableRemovableDriveIndexing
    * right click on ( the new) DisableRemovableDriveIndexing  and set the value to 1. 
 
+Not sure what are the consequences are from this change.  But I dislike it that windows is always writing to my USB disks so I leave this setting for the moment. 
+
 Restart the computer. 
 
 In my case if I connect the FDRM KL25Z the "drive" doesn't disconnect anymore.
+
+
+Finally you have to install the serial driver for windows following 
+
+( with the FDRM connected) 
+
+For windows10 it is not always clear to which com port the FDRM is connected. 
+
+So I check it in the Device manager 
+
+   * open the file explorer
+   * right click on this computer (or pc) 
+   * click on device manager
+   * look in the devices for Ports ( COM & LPT) 
+   * expand it and check for mbed and note the com nr. 
+
+
+I use putty to connect 
+
+In putty , select Serial 
+
+Edit the number after COM   ( in my case 3  so the Serial line is set to COM3 ) 
+check the speed is 9600  
+
+Save the session  ( I use mbed3 as name ) 
+
+If you now open there should be communication with the application ( of course you have to down load in the useal way first an application that communicates with the serial port , like the  "hello world" example 
+
+
+
 
 
 
