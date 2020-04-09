@@ -4,14 +4,15 @@
  *
  *  V 1.0  : tested on the KL05z  but without the MCP4728 connected 
  *  v 2.1  : for none MBED environment  and mbed-cli  without setaddr functionality 
- * (C) Wim Beaumont Universiteit Antwerpen 2016 
+ *  v 2.2  : April 2020  need dev_interface_def.h  for type defs 
+ * (C) Wim Beaumont Universiteit Antwerpen 2016 2020 
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
  
 
-#define MCP4728EXAMPLEVER "2.1"
-
+#define MCP4728EXAMPLEVER "2.2"
+#include "dev_interface_def.h"
 
 // OS / platform  specific  configs 
 #if defined  __MBED__ 
@@ -81,7 +82,7 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 
 #include "DACInterface.h" 
 
-#include "dev_interface_def.h"
+
 
 // #include "MCP4728setaddr.h"
 #include "mcp4728.h"

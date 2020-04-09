@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
-
+#include "dev_interface_def.h"
 #include "LinuxI2CInterface_a.h"
 
 char *filename = (char*)"/dev/i2c-1";

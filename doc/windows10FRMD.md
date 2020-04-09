@@ -97,6 +97,31 @@ Save the session  ( I use mbed3 as name )
 
 If you now open there should be communication with the application ( of course you have to down load in the useal way first an application that communicates with the serial port , like the  "hello world" example 
 
+Issue with not finding the serial port. 
+
+One of the students reported that the serial port was not found.
+
+He installed the serial port driver 
+
+The MBED was seen a a disk 
+
+He installed an other driver 
+
+(after consulting 
+
+https://www.nxp.com/document/guide/get-started-with-the-frdm-kl25z:NGS-FRDM-KL25Z?fbclid=IwAR1uYIifVd2KZ5ykBCsqT8xffEhp2Qp9enV3M8edLb_J-rIKe-v-8fbqqeI
+
+)
+
+ He followed the link in  "2.3 PC Configuration". to the webiste  http://www.pemicro.com/opensda/
+ 
+ 
+ comment on the web site : 
+ 
+OpenSDA Support - P&E Microcomputer Systems
+GDB SERVER PLUG-IN for Eclipse-based ARM® IDEs: PEmicro's GDB Server Plug-In for Eckipse-based ARM IDEs allows GNU GDB tools to work with the OpenSDA and OSJTAG embedded debug circuitry incorporated into many of NXP's Tower and Freedom development boards, as well as PEmicro's ARM Cortex-compatible hardware interfaces. A free download of the plug-in is available.
+www.pemicro.com
+
 
 
 

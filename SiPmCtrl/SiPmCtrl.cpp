@@ -16,6 +16,8 @@
 #define SIPMCTRL "1.51"
 
 
+#include "dev_interface_def.h"
+
 // OS / platform  specific  configs 
 #if defined  __MBED__ 
 #define  OS_SELECT "MBED" 

@@ -271,7 +271,10 @@ There is a name clash of the dev read/ write function  and the I2CInterface (sam
 
 pitfall :  if you do first $>cmake .  -DDUMMY=true   , then use   >cmake .  -DDUMMY=false , because cmake keep the value in the  cache . 
 
-As I have no Linux computers with I2C I can only test it on Raspberry Pi 
+As I have no Linux computers interface with I2C I can only test it on Raspberry Pi 
+
+Since April 2020  also the  "register read" function is implemented,  this is   Addres Writer , register(byte only)  RESTART  AdressRead , read data  STOP.  So there is no stop between the write and read. 
+
 
 
 ### directories 

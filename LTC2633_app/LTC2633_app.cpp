@@ -9,14 +9,18 @@
  *  V 1.0  : copied from LTC2633_tst.cpp 
  *  V 1.24  : working with the hardware simple increasing
  *  V 1.63  : with commands via the serial interface,   MBED targeting . 
+ *  V 1.64  	Apr 2020 put  "ltc2633.h" as this defines types ( linux) still targeting MBED  
  * (C) Wim Beaumont Universiteit Antwerpen 2019
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
  
 
-#define LTC2633_SIPM_CTRL "1.63"
+#define LTC2633_SIPM_CTRL "1.64"
 
+
+// #include "LTC2633setaddr.h"
+#include "ltc2633.h"
 
 // OS / platform  specific  configs 
 #if defined  __MBED__ 
@@ -79,11 +83,6 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 
 
 #include "DACInterface.h" 
-
-#include "dev_interface_def.h"
-
-// #include "LTC2633setaddr.h"
-#include "ltc2633.h"
 
 
 //#include <stdlib.h>

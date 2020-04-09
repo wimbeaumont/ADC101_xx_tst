@@ -5,13 +5,18 @@
  *  V 2.1  : nov 2019 copied from MCP4728_test  is 2.1 inital because forgot to set it to 1.0 
  *  V 2.2  : nov 2019 some changes in comments , 
 			 small not functional changes tested on hardware with MBED _KL25Z
+ *  V 2.3  : Apr 2020 put  "ltc2633.h" as this defines types ( linux )
  * (C) Wim Beaumont Universiteit Antwerpen 2019 
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
  
 
-#define LTC2633EXAMPLEVER "2.2"
+#define LTC2633EXAMPLEVER "2.3"
+
+
+// #include "LTC2633setaddr.h"
+#include "ltc2633.h"
 
 
 // OS / platform  specific  configs 
@@ -75,10 +80,6 @@ DummyI2CInterface* mbedi2cp= &mbedi2c;
 
 #include "DACInterface.h" 
 
-#include "dev_interface_def.h"
-
-// #include "LTC2633setaddr.h"
-#include "ltc2633.h"
 
 
 I2CInterface* i2cdev= mbedi2cp;
