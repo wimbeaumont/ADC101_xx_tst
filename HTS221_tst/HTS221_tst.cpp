@@ -7,13 +7,14 @@
  *  V 0.21 : heater added
  *  V 0.30 : removed tsi sensor , version for git hub and mbed-cli
  *  V 0.40 : version for Linux / Raspberry Pi 
+ *  V 0.41 : version for Linux / Raspberry Pi  debugging
  * (C) Wim Beaumont Universiteit Antwerpen 2017 2019
  *
  * License see
  * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define HTS221EXAMPLEVER "0.40"
+#define HTS221EXAMPLEVER "0.43"
 
 
 #include "dev_interface_def.h"
@@ -109,26 +110,27 @@ int main(void) {
    printf("getVersion :%s ",gv.getversioninfo());
    gv.dev_interface_def_version(dummystr);
    printf(" def type version  :%s\n\r ",dummystr);
-   HTS221 shs ( i2cdev);
+   HTS221 shs ( i2cdev,true,true);
    printf ( "HTS221 lib version :%s\n\r ",shs.getversioninfo());
 
     shs.getHCalValues(  H0_rh, H1_rh, H0_T0_out,H1_T0_out);
-    printf("  H0_rh %f, H1_rh %f , H0_T0_out %d ,H1_T0_out %d  \n\r", H0_rh, H1_rh, H0_T0_out,H1_T0_out);
+	printf("  H0_rh %f, H1_rh %f , H0_T0_out %d ,H1_T0_out %d  \n\r", H0_rh, H1_rh, H0_T0_out,H1_T0_out);
+	//int status=shs.readAllReg(  );    if ( status != 0) printf("failed to read all reg \n\r");
     float hum, Temp;
     int lc=1;
     int id;
     while(1) {
         
-         if (lc %50 ) {  
+         if (lc %100 ) {  
             id=(int) shs.ReadID();
-            printf("Who Am I returns %02x lc:%d\n\r", id,lc++ );  
+            printf("lc:%04d ChipID=%02x ",lc++,id );  
             
             shs.GetHumidity(&hum);
             shs.GetTemperature(&Temp);
-             printf("Humidity  %f ,  Temperature %f \n\r",hum,Temp);
+             printf("Temperature %f,Humidity  %f   ",Temp, hum);
             shs.GetRawHumidity(&H_T_OUT);
             hum=H0_rh+ ( H1_rh -H0_rh) * (float) ( H_T_OUT - H0_T0_out) / float(H1_T0_out-H0_T0_out);
-            printf("Humidity %f ,RawData %d \n\r",hum,H_T_OUT);
+            printf("Humidity %f ,RawData %04X \n\r",hum,H_T_OUT);
             i2cdev->wait_for_ms(1000); 
         }
         else {
