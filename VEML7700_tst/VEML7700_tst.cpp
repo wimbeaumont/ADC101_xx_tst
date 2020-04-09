@@ -4,19 +4,29 @@
  *  https://github.com/wimbeaumont/peripheral_dev_tst.git
  *  copied from the mbed online compiler envionment 
  *  V 0.1  : initial version for software development ( dummy i2c interface 
- *  
+ *  V 1.6x :  worked with mbed 
+ *  V 1.70  :  check with linux RP
  * (C) Wim Beaumont Universiteit Antwerpen 2017 2019
  *
  * License see
  * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define VEML7700EXAMPLEVER "1.62"
+#define VEML7700EXAMPLEVER "1.70"
 
-#ifdef __MBED__ 
+
+
+#include "dev_interface_def.h"
+#include "veml7700.h"
+
+
+
+
+// OS / platform  specific  configs 
+#if defined  __MBED__ 
+#define  OS_SELECT "MBED" 
 
 #include "mbed.h"
-
 
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
   PinName const SDA = PTE0;
@@ -30,32 +40,44 @@
 #else
   #error TARGET NOT DEFINED
 #endif
+
 Serial pc(USBTX, USBRX);
 
 #include "I2C.h"
-#include "I2CInterface.h"
 #include "MBEDI2CInterface.h"  
-
-#else 
-
-#include <cstdio>
-#include "DummyI2CInterface.h"  
-
-#endif //__MBED__
-
-#include "dev_interface_def.h"
-#include "veml7700.h"
-
-
-
-
-#ifdef __MBED__ 
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
+
+//------------------ end MBED specific config
+#elif defined __LINUX__
+
+#define  OS_SELECT "linux_i2c" 
+
+#include <cstdio>
+#include <cstdlib>
+#include "LinuxI2CInterface.h"
+
+char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 
+LinuxI2CInterface  mbedi2c(filename);
+LinuxI2CInterface* mbedi2cp= &mbedi2c;
+
+//------------------ end Linux I2C specific config
 #else 
+#define  OS_SELECT "linux_dummy" 
+
+#include <cstdio>
+#include <cstdlib>
+#include "DummyI2CInterface.h"
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
-#endif //__MBED__
+
+#endif  // __MBED__ 
+//------------------ end Linux dummy specific config
+#ifndef OS_SELECT 
+#define OS_SELECT "linux_dummy" 
+#endif
+// --- end platform specific configs 
+
 
 
 I2CInterface* i2cdev= mbedi2cp;
