@@ -41,7 +41,13 @@
   #error TARGET NOT DEFINED
 #endif
 
+
+#if  MBED_MAJOR_VERSION > 5 
+BufferedSerial pc(USBTX, USBRX);
+#else 
 Serial pc(USBTX, USBRX);
+#endif 
+	
 
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  

@@ -42,7 +42,7 @@
   #error TARGET NOT DEFINED
 #endif
 
-Serial pc(USBTX, USBRX);
+//Serial pc(USBTX, USBRX);
 
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
