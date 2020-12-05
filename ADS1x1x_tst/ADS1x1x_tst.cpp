@@ -6,6 +6,7 @@
 * ver 0.1  copied from ADC_101 
 * ver 0.7 checked with ADC1515  
 * ver 0.8  introduced the MBED DAC , for other hardware it is a dummy or you can replace the DAQ inter
+* ver 2.0  test version for alert pin functionality
 * (C) Wim Beaumont Universiteit Antwerpen  2019 ,2020
 * License see
 * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
@@ -17,7 +18,7 @@
 #endif
 
 
-#define ADS1x1x_test_ver  "0.74"
+#define ADS1x1x_test_ver  "2.01"
 
 
 
@@ -45,19 +46,17 @@
   #error TARGET NOT DEFINED
 #endif
 
-#if  MBED_MAJOR_VERSION > 5 
-BufferedSerial pc(USBTX, USBRX);
-#else 
-Serial pc(USBTX, USBRX);
-#endif 
-
 #include "I2C.h"
 #include "MBEDI2CInterface.h"  
 #include "DAC_MBED.h"
+//#include "DummyDigitalIn.h"
 MBEDI2CInterface mbedi2c( SDA, SCL); 
 MBEDI2CInterface* mbedi2cp=  &mbedi2c ;
 DAC_MBED mbeddac( PTE30); 
 DAC_MBED* dacp=&mbeddac ;
+
+//DummyDigitalIn alertstat(1);
+//DigitalIn alertstat(PTE20);
 //------------------ end MBED specific config
 #elif defined __LINUX__
 
@@ -66,13 +65,15 @@ DAC_MBED* dacp=&mbeddac ;
 #include <cstdio>
 #include <cstdlib>
 #include "LinuxI2CInterface.h"
-#include "DacInterface.h"
-
+#include "DACInterface.h"
+#include "DummyDigitalIn.h"
+DummyDigitalIn alertstat(1);
 char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment 
 LinuxI2CInterface  mbedi2c(filename);
 LinuxI2CInterface* mbedi2cp= &mbedi2c;
-DACInterface dacdummy();
-DACInterface* dac=&dacdummy();
+DACInterface dacdummy;
+DACInterface* dac = &dacdummy;
+
 //------------------ end Linux I2C specific config
 #else 
 #define  OS_SELECT "linux_dummy" 
@@ -80,12 +81,13 @@ DACInterface* dac=&dacdummy();
 #include <cstdio>
 #include <cstdlib>
 #include "DummyI2CInterface.h"
-#include "DacInterface.h"
+#include "DACInterface.h"
+#include "DummyDigitalIn.h"
 DummyI2CInterface  mbedi2c;
 DummyI2CInterface* mbedi2cp= &mbedi2c;
-DACInterface dacdummy();
-DACInterface* dac=&dacdummy();
-
+DACInterface dacdummy;
+DACInterface* dacp = &dacdummy;
+DummyDigitalIn alertstat(1);
 
 #endif  // __MBED__ 
 //------------------ end Linux dummy specific config
@@ -96,12 +98,16 @@ DACInterface* dac=&dacdummy();
 
 
 
-I2CInterface* i2cdev= mbedi2cp;
+
 
 
 
 int main(void){
-    
+    I2CInterface* i2cdev= mbedi2cp;
+//#if defined  __MBED__ 	
+    // not clear why this can not defined as global. Gives with  MBED OS6 a fatal erro 	
+    DigitalIn alertstat(PTE20);
+//#endif     
     i2cdev->frequency(400000); 
     ADS1x1x adc(i2cdev,  0,   1515,1, 0);
     int status;
@@ -114,9 +120,9 @@ int main(void){
     float  dacv=0;
     float  dacstep=.2;
     float  dacmax=3.3;    
-    while (true) {
-        
-      
+    bool  chkalertnot=true;
+  while (1) {  
+    while (chkalertnot) {
         i2cdev->wait_for_ms(900);
         dacp->setVoltage( dacv); 
         printf("Vout %f ",dacv);
@@ -130,9 +136,73 @@ int main(void){
 	           printf( "%fV " ,voltage);
         	}
 	}        	
-        printf("\n\r") ;
+	printf("\n\r");
         dacv+=dacstep;
-        if ( dacv > dacmax) dacv=0;
-           
+        if ( dacv > dacmax) { dacv=0; chkalertnot=false; }
     }
+	int ch=3;
+	adc.getVoltage( voltage,ch );  // get mux set  to 3 
+	dacp->setVoltage( 0); 
+        printf("\n\r") ;
+ 	printf("allert tests \n\r");
+ 	printf("initial allert status %d  \n\r setup none window \n\r", alertstat.read() );
+ 	int16_t digv=adc.getDigValue( 2* 3.3/3);
+ 	int16_t digvl=adc.getDigValue(2* 3.3/3);
+ 	// normal cmp mode no latch, pol 0
+	printf("before configure %d  \n\r", alertstat.read() );
+ 	adc.setAlertPinMode( 2,(int)digv ); 
+ 	printf("after configure %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax1 %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0 1 %d  \n\r", alertstat.read() );
+
+  	// normal cmp mode no latch, pol 1, cnt 0 
+	adc.setAlertPinMode( 2,digv,0x8000, 0, 1 ); 
+ 	printf("after configure pol 1 %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+	// normal cmp mode no latch, cnt 2  pol 0
+ 	adc.setAlertPinMode( 2,digv, 0x8000, 2, 0 ); 
+ 	printf("after configure cnt2  %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax 1 %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax 2 %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax 3 %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+
+	// normal cmp mode latched ,  cnt 0 pol 0
+  	adc.setAlertPinMode( 5,digv); 
+  	printf("after configure latch mode %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+	adc.getVoltage( voltage,ch);// reset latch 
+  	printf("after adc read %f ,  %d  \n\r",voltage, alertstat.read() );
+  	adc.setAlertPinMode( 3,digv,digvl ); // window  mode  none latched ,  cnt 0 pol 0
+  	printf("after configure window %d  \n\r", alertstat.read() );
+  	dacp->setVoltage( dacmax); 
+ 	printf("after dacmax %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( dacmax/2); 
+ 	printf("after dacmax/2  %d  \n\r", alertstat.read() );
+ 	dacp->setVoltage( 0); 
+  	printf("after dac 0x %d  \n\r", alertstat.read() );
+  	
+ 
+  }
+ 
 }
