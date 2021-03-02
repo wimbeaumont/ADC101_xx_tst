@@ -18,7 +18,7 @@
 #endif
 
 
-#define ADS1x1x_test_ver  "2.01"
+#define ADS1x1x_test_ver  "2.02"
 
 
 
@@ -72,7 +72,8 @@ char *filename = (char*)"/dev/i2c-1";  //hard coded for the moment
 LinuxI2CInterface  mbedi2c(filename);
 LinuxI2CInterface* mbedi2cp= &mbedi2c;
 DACInterface dacdummy;
-DACInterface* dac = &dacdummy;
+DACInterface* dacp = &dacdummy;
+
 
 //------------------ end Linux I2C specific config
 #else 
@@ -100,14 +101,12 @@ DummyDigitalIn alertstat(1);
 
 
 
-
-
 int main(void){
     I2CInterface* i2cdev= mbedi2cp;
-//#if defined  __MBED__ 	
+#if defined  __MBED__ 	
     // not clear why this can not defined as global. Gives with  MBED OS6 a fatal erro 	
-    DigitalIn alertstat(PTE20);
-//#endif     
+    DigitalIn alertstat(PTE20);  
+#endif     
     i2cdev->frequency(400000); 
     ADS1x1x adc(i2cdev,  0,   1515,1, 0);
     int status;
@@ -117,6 +116,7 @@ int main(void){
     printf("test program for the ADS1x1x  lib , version %s compiled at %s %s  \n\r",
 		ADS1x1x_test_ver , __DATE__ , __TIME__ );
     printf("ADS1x1x lib  %s \n\r",  adc.getversioninfo());
+    printf("compiled for  %s \n\r" , OS_SELECT);
     float  dacv=0;
     float  dacstep=.2;
     float  dacmax=3.3;    
@@ -138,7 +138,7 @@ int main(void){
 	}        	
 	printf("\n\r");
         dacv+=dacstep;
-        if ( dacv > dacmax) { dacv=0; chkalertnot=false; }
+        if ( dacv > dacmax) { dacv=0; } //chkalertnot=false; }
     }
 	int ch=3;
 	adc.getVoltage( voltage,ch );  // get mux set  to 3 

@@ -13,11 +13,12 @@
  *  ver  0.34  used new error reporter 
  *  ver  0.40  tested with Raspberry PI 
  *  ver  0.41  resuffel platform specific configuration part
+ *  ver  0.50  added checking for devices if none is found 
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define AT30TSE753EXAMPLEVER "0.41"
+#define AT30TSE753EXAMPLEVER "0.50"
 
 #include "dev_interface_def.h"
 #include "AT30TSE75x.h"
@@ -99,7 +100,6 @@ int main(void) {
 
    // get the version of getVersion 
    getVersion gv;
-   int addr=0;
    int i2cerr;
    
    printf("AT30TSE752  example program version %s, compile date %s time %s\n\r",AT30TSE753EXAMPLEVER,__DATE__,__TIME__);
@@ -112,14 +112,13 @@ int main(void) {
    bool addrfound[8];
    printf ( "AT30SE75x version :%s\n\r ",tid[0].getversioninfo());   
    for (int lc=0; lc <8 ;lc++) {
-
-        printf( "Taddr %x , Eaddr %x  subaddr %d\n\r ", tid[lc].getTaddr(),tid[lc].getEaddr(), addr);
+        printf( "Taddr %x , Eaddr %x \n\r ", tid[lc].getTaddr(),tid[lc].getEaddr());
         if( tid[lc].getInitStatus() ){ 
 		addrfound[lc]=false; 
 		printf("reading config registers failed ");
 		printf("last: ack status:%d , i2cerr %d not supported %d \n\r",
 			(int)i2cdev->getLastAckStatus(),i2cdev->getLastComError(),(int)i2cdev->getNotSupported());
-	} 
+        } 
         else {
             addrfound[lc]=true;   
             tid[lc].set_resolution(12 , i2cerr );
@@ -130,6 +129,17 @@ int main(void) {
             int configrd= tid[lc].read_config( i2cerr, 0);
             printf( " config %x  I2cerr %d \n\r", configrd,i2cerr ); 
         }
+   }   
+   bool somefound=false;  
+   for( int lc=0; lc <8 ;lc++) { somefound =somefound || addrfound[lc] ;} 
+   if ( ! somefound) {
+       int error; 
+       while (1) { // just loop to get the I2C line active to debug
+            for( int lc=0; lc <8 ;lc++) {
+                tid[lc].get_THighLimitRegister(error, 1);
+                if( error) { printf("error for addr  %d \n\r", tid[lc].getTaddr()); }
+            }
+       }
     }
    int pagenr=0;
    const int nrstrs=4;
