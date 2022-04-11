@@ -23,6 +23,7 @@
 * [linux i2c dev ](#linux-i2c-dev-)
 	* [directories ](#directories-)
 * [raspberry PI](#raspberry-PI)
+* [raspberry PI pico]((# raspberry PI pico) 
 * [other considered platforms ](#other-considered-platforms-)
 
 
@@ -311,7 +312,7 @@ make ( in the cmake directorie)
 
 
 
-## raspberry PI
+## raspberry PI  
 
 cmake is not defaul installed on the Raspberry Pi so you have to install it.  In the documentation there are also remarks that you have to activate the I2C device  ( but for the once I have it was always the case ).
 
@@ -322,6 +323,13 @@ The  same as linux i2c dev  so with the same limitations.
 
 Consider to use a library for the Broadcom chip, but first to see how the Raspberry Pi 4 will be supported. 
 
+## raspberry PI pico 
+
+11 April 2022  
+added in PeripheralDevices  PicoI2CInterface.h
+Tested it with HTS221_tst and AT30TSE752_tst . 
+But not supported the build in this package. 
+build support will be done in an other repository 
 
 
 ## other considered platforms 
