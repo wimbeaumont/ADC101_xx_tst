@@ -8,22 +8,34 @@
  *  V 0.30 : removed tsi sensor , version for git hub and mbed-cli
  *  V 0.40 : version for Linux / Raspberry Pi 
  *  V 0.41 : version for Linux / Raspberry Pi  debugging
- * (C) Wim Beaumont Universiteit Antwerpen 2017 2019
+ *  V 0.50 : version Raspberry Pi  pico only
+ *  V 0.60 : version  integrated , comment out heater  
+ * (C) Wim Beaumont Universiteit Antwerpen 2017 2019 2022
  *
  * License see
  * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define HTS221EXAMPLEVER "0.43"
+#define HTS221EXAMPLEVER "0.60"
+
+ 
 
 
 #include "dev_interface_def.h"
 #include "hts221.h"
 
-
-
 // OS / platform  specific  configs 
-#if defined  __MBED__ 
+#ifdef __PICO__ 
+#include <stdio.h>
+#include "pico/stdlib.h"
+//#include "hardware/i2c.h"
+#include "hardware/timer.h"
+#include "hardware/watchdog.h"
+#include "hardware/clocks.h"
+#include "PicoI2CInterface.h"
+PicoI2CInterface mbedi2c;
+PicoI2CInterface*  mbedi2cp = &mbedi2c;
+#elif  defined  __MBED__ 
 #define  OS_SELECT "MBED" 
 
 #include "mbed.h"
@@ -100,6 +112,11 @@ void print_buf_hex( char *data, int length){
 
 
 int main(void) {
+#ifdef __PICO__    
+       stdio_init_all();// pico init 
+#endif 
+
+   
    
     float H0_rh, H1_rh;//< Humidity for calibration 
     int16_t H0_T0_out, H1_T0_out;//<Output Humidity value for calibration
@@ -127,23 +144,26 @@ int main(void) {
         
          if (lc %100 ) {  
             id=(int) shs.ReadID();
-            printf("lc:%04d ChipID=%02x ",lc++,id );  
+            printf("lc:%04d ChipID=%02x ",lc,id );  
             
             shs.GetHumidity(&hum);
             shs.GetTemperature(&Temp);
-             printf("Temperature %f,Humidity  %f   ",Temp, hum);
+            printf("Temperature %f,Humidity  %f   ",Temp, hum);
             shs.GetRawHumidity(&H_T_OUT);
             hum=H0_rh+ ( H1_rh -H0_rh) * (float) ( H_T_OUT - H0_T0_out) / float(H1_T0_out-H0_T0_out);
-            printf("Humidity %f ,RawData %04X \n\r",hum,H_T_OUT);
-            i2cdev->wait_for_ms(1000); 
+            printf("Humidity %f ,RawData %04X ",hum,H_T_OUT);
+            printf("\n\r");
+            i2cdev->wait_for_ms(400); 
         }
-        else {
-            printf(" on heater for 5 s lc:%d \n\r",lc++);
+/*        else {
+            printf(" on heater for 5 s lc:%d \n\r",lc);
             shs.Heater_On();
             i2cdev->wait_for_ms(5000);
             shs.Heater_Off();
             i2cdev->wait_for_ms(1000);
         }
+*/
+		lc++;
     }
     
    

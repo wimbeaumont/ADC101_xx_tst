@@ -14,22 +14,35 @@
  *  ver  0.40  tested with Raspberry PI 
  *  ver  0.41  resuffel platform specific configuration part
  *  ver  0.50  added checking for devices if none is found 
+ *  ver  0.60  added PICO support
  *  License see
  *  https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define AT30TSE753EXAMPLEVER "0.50"
+#define AT30TSE753EXAMPLEVER "0.60"
 
 #include "dev_interface_def.h"
 #include "AT30TSE75x.h"
 
 
 // OS / platform  specific  configs 
-#if defined  __MBED__ 
+
+// OS / platform  specific  configs 
+#ifdef __PICO__ 
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include "stdlib.h" // for atof 
+//#include "hardware/i2c.h"
+#include "hardware/timer.h"
+#include "hardware/watchdog.h"
+#include "hardware/clocks.h"
+#include "PicoI2CInterface.h"
+PicoI2CInterface mbedi2c;
+PicoI2CInterface*  mbedi2cp = &mbedi2c;
+#elif  defined  __MBED__ 
 #define  OS_SELECT "MBED" 
 
 #include "mbed.h"
-
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
   PinName const SDA = PTE0;
   PinName const SCL = PTE1;
@@ -97,6 +110,9 @@ void print_buf_hex( char *data, int length){
 
 
 int main(void) { 
+#ifdef __PICO__    
+       stdio_init_all();// pico init 
+#endif 
 
    // get the version of getVersion 
    getVersion gv;
@@ -136,8 +152,9 @@ int main(void) {
        int error; 
        while (1) { // just loop to get the I2C line active to debug
             for( int lc=0; lc <8 ;lc++) {
-                tid[lc].get_THighLimitRegister(error, 1);
+                float THlim=tid[lc].get_THighLimitRegister(error, 1);
                 if( error) { printf("error for addr  %d \n\r", tid[lc].getTaddr()); }
+                else {   printf("for addr  %d got %f \n\r", tid[lc].getTaddr(),THlim ); }
             }
        }
     }
