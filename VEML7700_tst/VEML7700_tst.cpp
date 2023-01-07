@@ -6,13 +6,14 @@
  *  V 0.1  : initial version for software development ( dummy i2c interface 
  *  V 1.6x :  worked with mbed 
  *  V 1.70  :  check with linux RP
- * (C) Wim Beaumont Universiteit Antwerpen 2017 2019
+ *  V 1.80 :  added pico support ,not tested with hardware 
+ * (C) Wim Beaumont Universiteit Antwerpen 2017 2022
  *
  * License see
  * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
  */ 
 
-#define VEML7700EXAMPLEVER "1.70"
+#define VEML7700EXAMPLEVER "1.80"
 
 
 
@@ -21,9 +22,21 @@
 
 
 
+// OS / platform  specific  configs 
 
 // OS / platform  specific  configs 
-#if defined  __MBED__ 
+#ifdef __PICO__ 
+#include <stdio.h>
+#include "pico/stdlib.h"
+//#include "hardware/i2c.h"
+#include "hardware/timer.h"
+#include "hardware/watchdog.h"
+#include "hardware/clocks.h"
+#include "PicoI2CInterface.h"
+PicoI2CInterface mbedi2c;
+PicoI2CInterface*  mbedi2cp = &mbedi2c;
+#elif  defined  __MBED__ 
+
 #define  OS_SELECT "MBED" 
 
 #include "mbed.h"
@@ -90,6 +103,9 @@ I2CInterface* i2cdev= mbedi2cp;
 
 
 int main(void) {
+#ifdef __PICO__    
+       stdio_init_all();// pico init 
+#endif 
    
    // get the version of getVersion 
    char dummystr[50];

@@ -142,7 +142,7 @@ int main(void) {
     int id;
     while(1) {
         
-         if (lc %100 ) {  
+         //if (lc %600 ) {  
             id=(int) shs.ReadID();
             printf("lc:%04d ChipID=%02x ",lc,id );  
             
@@ -151,18 +151,21 @@ int main(void) {
             printf("Temperature %f,Humidity  %f   ",Temp, hum);
             shs.GetRawHumidity(&H_T_OUT);
             hum=H0_rh+ ( H1_rh -H0_rh) * (float) ( H_T_OUT - H0_T0_out) / float(H1_T0_out-H0_T0_out);
-            printf("Humidity %f ,RawData %04X ",hum,H_T_OUT);
+            printf("Humidity %f ,RawData %d ",hum,H_T_OUT);
             printf("\n\r");
             i2cdev->wait_for_ms(400); 
-        }
-/*        else {
-            printf(" on heater for 5 s lc:%d \n\r",lc);
+/*        }
+        else {
+			printf("  H0_rh %f, H1_rh %f , H0_T0_out %x ,H1_T0_out %xd  \n\r", H0_rh, H1_rh, H0_T0_out,H1_T0_out);
+            printf(" on heater for 10 s lc:%d \n\r",lc);
             shs.Heater_On();
+            i2cdev->wait_for_ms(5000);
             i2cdev->wait_for_ms(5000);
             shs.Heater_Off();
             i2cdev->wait_for_ms(1000);
+
         }
-*/
+        */
 		lc++;
     }
     

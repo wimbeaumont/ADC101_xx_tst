@@ -6,7 +6,8 @@
 * ver 0.3  compiled in mbed-cli envionment for the KL025Z 
 * ver 0.4  code for outside mbed environment removed led control
 * ver 0.50  : version for Linux / Raspberry Pi  
-* (C) Wim Beaumont Universiteit Antwerpen  2019
+* ver 0.60  : version including  Raspberry Pi   pico 
+* (C) Wim Beaumont Universiteit Antwerpen  2019 , 2022 
 * License see
 * https://github.com/wimbeaumont/PeripheralDevices/blob/master/LICENSE
 **/
@@ -17,7 +18,7 @@
 #endif
 
 
-#define ADC101_xx_test_ver  "0.50"
+#define ADC101_xx_test_ver  "0.60"
 
 
 
@@ -27,10 +28,19 @@
 
 
 // OS / platform  specific  configs 
-#if defined  __MBED__ 
+// OS / platform  specific  configs 
+#ifdef __PICO__ 
+#include <stdio.h>
+#include "pico/stdlib.h"
+//#include "hardware/i2c.h"
+//#include "hardware/timer.h"
+//#include "hardware/watchdog.h"
+//#include "hardware/clocks.h"
+#include "PicoI2CInterface.h"
+PicoI2CInterface mbedi2c;
+PicoI2CInterface*  mbedi2cp = &mbedi2c;
+#elif defined  __MBED__ 
 #define  OS_SELECT "MBED" 
-
-#include "mbed.h"
 
 #if   defined (TARGET_KL25Z) || defined (TARGET_KL46Z)
   PinName const SDA = PTE0;
@@ -94,7 +104,9 @@ const float Vdd=3.293;
 
 
 int main(void){
-    
+    #ifdef __PICO__    
+       stdio_init_all();// pico init 
+	#endif 
     i2cdev->frequency(400000); 
     ADC101_xx adc(i2cdev, 0,  Vdd);    
     int status;
