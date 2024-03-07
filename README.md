@@ -276,9 +276,17 @@ Tested with CentOs  7
 Uses cmake to generate the test programs.  If no hardware ( means /dev/i2c-?) is found the the cmake file will prepare for  the dummy device 
 
 
-go to the cmake directory<br>
-there  $>cmake .  -DDUMMY=true <br> 
-then  $>make  <br> 
+go to the build  directory<br>
+there  $>cmake ../cmake/CMakeLists.txt   -DDUMMY=true <br> 
+then  $>make  all<br> 
+or  $>make MCP4725_tst   ( or other device ) 
+
+to remove all compiled files , $>make clean 
+to start clean you can remove all files in the build directory ( except the .gitignore file).  So rm * 
+and rm -rf CMakeFiles
+
+
+
 
 ## linux i2c dev 
 If the /dev/i2c-1 is found the make file will generate the make file.  This is hard coded in the cmake so you have to edit this if you want to use an other device.
