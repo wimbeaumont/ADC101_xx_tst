@@ -299,7 +299,7 @@ As I have no Linux computers interface with I2C I can only test it on Raspberry 
 
 Since April 2020  also the  "register read" function is implemented,  this is   Addres Writer , register(byte only)  RESTART  AdressRead , read data  STOP.  So there is no stop between the write and read. 
 
-
+Also you have to add the user to the i2c groupr sudo usermod  -aG i2c digpr 
 
 ### directories 
 
@@ -323,7 +323,12 @@ make ( in the cmake directorie)
 ## raspberry PI  
 
 cmake is not defaul installed on the Raspberry Pi so you have to install it.  In the documentation there are also remarks that you have to activate the I2C device  ( but for the once I have it was always the case ).
+to activate the i2c interface https://www.raspberrypi-spy.co.uk/2014/11/enabling-the-i2c-interface-on-the-raspberry-pi/
 
+
+Also consider to install :  sudo apt-get install -y python3-smbus i2c-tools
+Also you have to add the user to the i2c groupr sudo usermod  -aG i2c digpr  
+If not member of the i2c group . cmake can not find the /dev/i2c-1  even if it is present
 
 The  same as linux i2c dev  so with the same limitations. 
 

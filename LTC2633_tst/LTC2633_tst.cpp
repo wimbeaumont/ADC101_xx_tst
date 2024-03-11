@@ -92,7 +92,7 @@ int main(void) {
    getVersion gv;
    int addr= 0x10; //8 bits address  assume CAO is connected to ground  (global address is 0x73
    printf("LTC2633 example program version %s, compile date %s time %s\n\r",LTC2633EXAMPLEVER,__DATE__,__TIME__);
-   printf("getVersion :%s\n\r ",gv.getversioninfo());
+   printf("getVersion :%s compile for %s \n\r ",gv.getversioninfo(),OS_SELECT);
    int Vreftype=1 , resolution=12;
    LTC2633  dac(i2cdev, addr,  Vrefext ,Vreftype , resolution  );
    printf("\n\raddr %d LTC2633 :%s\n\r",addr,dac.getversioninfo());
@@ -115,7 +115,7 @@ int main(void) {
                 }
                 printf("\n\r");
             }
-             cnt++;
+             cnt+=10;
              cnt=cnt % 4096;     
              i2cdev->wait_for_ms(200);
 
@@ -127,8 +127,9 @@ int main(void) {
   while(1){
            // first set the 4 channels 
            for ( int cc =0 ; cc <2 ; cc++) { 
-               if ( di->setDACvalue(cnt,cc) )
-                   printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
+               if ( di->setDACvalue(cnt,cc) ){
+                  // printf("failed to set dac value %d for channel %d\n\r",cnt,cc);
+                }
             }
             printf("set DAC value  to %d result in",cnt);
                // no else read anyway even if set fails 
